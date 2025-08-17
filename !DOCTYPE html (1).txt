@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diễn đàn "Sáng Tạo Mỗi Ngày"</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+    }
+    #chat-container {
+        width: 400px;
+        max-height: 80vh;
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        overflow-y: auto;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .message {
+        padding: 10px 15px;
+        margin: 8px 0;
+        border-radius: 20px;
+        display: inline-block;
+        max-width: 80%;
+        word-wrap: break-word;
+        animation: fadeIn 0.5s;
+    }
+    .admin { background: #4a90e2; color: #fff; align-self: flex-start; }
+    .Lan { background: #ff6b9a; color: #fff; align-self: flex-start; }
+    .Minh { background: #e74c3c; color: #fff; align-self: flex-start; }
+    .other { background: #d3d3d3; color: #000; align-self: flex-start; }
+
+    .sender {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    #chat-container .message {
+        opacity: 0;
+    }
+
+    @keyframes fadeIn {
+        to { opacity: 1; }
+    }
+</style>
+</head>
+<body>
+<div id="chat-container"></div>
+
+<script>
+const messages = [
+  {sender:"Admin Huy", text:"Chào mọi người! 👋\nHôm nay diễn đàn “Sáng Tạo Mỗi Ngày” mở chủ đề thảo luận:\n👉 “Học nhóm online có hiệu quả hơn học nhóm trực tiếp không?”\nAi có trải nghiệm thì cùng chia sẻ nha.", type:"admin"},
+  {sender:"Thành viên N", text:"Hóng xem team nào đông hơn ~", type:"other"},
+  {sender:"Lan", text:"Theo mình, học nhóm online hiệu quả hơn học trực tiếp.\n* Tiết kiệm thời gian di chuyển.\n* Dễ chia sẻ tài liệu ngay lập tức.\n* Ai cũng có thể tham gia dù ở bất kỳ đâu.\nNhóm mình đã duy trì 6 tháng và kết quả tiến bộ rõ rệt.", type:"Lan"},
+  {sender:"Thành viên C", text:"Nghe hợp lý đó Lan. Bên nhóm mình cũng thử học online mấy lần, khá tiện.", type:"other"},
+  {sender:"Minh", text:"Mình không đồng ý. Học trực tiếp mới tạo sự gắn kết thật sự. Online chỉ khiến tương tác giảm, dễ mất tập trung. Nhiều người vừa học vừa lướt Facebook.", type:"Minh"},
+  {sender:"Thành viên F", text:"😅 Chuẩn, có lần mình “bật camera on” nhưng ngồi… ngủ gật luôn.", type:"other"},
+  {sender:"Lan", text:"Anh nói vậy chắc anh chưa trải nghiệm hết ưu điểm của online đâu.", type:"Lan"},
+  {sender:"Minh", text:"Câu này nghe như em đang phủ nhận kinh nghiệm của anh. Ý em là anh thiếu hiểu biết à?", type:"Minh"},
+  {sender:"Thành viên G", text:"Ui, câu này gắt nha. Có vẻ drama sắp nổ ra rồi.", type:"other"},
+  {sender:"Lan", text:"Em không có ý đó, chỉ muốn nói online có nhiều điểm mạnh và lợi ích hơn anh nghĩ.", type:"Lan"},
+  {sender:"Minh", text:"Nghe giống kiểu 'ai không theo online là lạc hậu' vậy.", type:"Minh"},
+  {sender:"Lan", text:"Anh đang bóp méo lời em nói đấy!", type:"Lan"},
+  {sender:"Thành viên P", text:"Ông Minh cay rồi kìa! Haha 😝", type:"other"},
+  {sender:"Minh", text:"Hay là do em chưa học nhóm trực tiếp đúng cách?", type:"Minh"},
+  {sender:"Lan", text:"Anh đang ám chỉ em không biết học à?", type:"Lan"},
+  {sender:"Thành viên D", text:"Bình tĩnh nào, mọi người.", type:"other"},
+  {sender:"Thành viên P", text:"Mới 5 phút mà nóng dữ…", type:"other"},
+  {sender:"Lan", text:"Em rất bình tĩnh, chỉ là không thích bị vặn vẹo như vậy.", type:"Lan"},
+  {sender:"Minh", text:"Thì em cũng đâu có nhẹ nhàng khi nói anh 'chưa trải nghiệm hết'. Và anh cũng không thích bị người khác dạy đời!", type:"Minh"},
+  {sender:"Lan", text:"Nếu ai cũng nghĩ offline mới đúng thì tụi em đã chẳng duy trì được nhóm online suốt nửa năm rồi!", type:"Lan"},
+  {sender:"Minh", text:"Thế em đang ám chỉ nhóm anh... thất bại???", type:"Minh"},
+  {sender:"Lan", text:"Em không hề nói vậy! Anh đang suy diễn quá rồi đấy.", type:"Lan"},
+  {sender:"Thành viên H", text:"Căng vậy mọi người ơi...", type:"other"},
+  {sender:"Lan", text:"Thực tế, nhóm em học online 2 buổi/tuần, hiệu quả hơn hẳn mấy buổi offline trước đây toàn tốn thời gian tám chuyện.", type:"Lan"},
+  {sender:"Thành viên H", text:"😬 Lan nói thế đụng nhóm offline rồi đó nha…", type:"other"},
+  {sender:"Minh", text:"Em đang nói mỉa nhóm của anh à? Đấy không hề suy diễn nhé! Em vừa nói offline toàn phí thời gian tám chuyện. Vậy anh và nhóm anh là đồ... phí thời gian???", type:"Minh"},
+  {sender:"Lan", text:"Anh đừng áp đặt! Em chỉ kể trải nghiệm của nhóm em. Còn nếu anh thấy giống... thì tự ngẫm đi! 🤗", type:"Lan"},
+  {sender:"Thành viên E", text:"Ối dồi ôi, bùng nổ rồi!!!", type:"other"},
+  {sender:"Thành viên L", text:"Team offline không dễ bị coi thường đâu nha!", type:"other"},
+  {sender:"Thành viên H", text:"Team online cũng không ngán, bằng chứng rõ ràng rồi còn gì.", type:"other"},
+  {sender:"Minh", text:"Lan, thái độ của em là đang coi thường người khác đấy!", type:"Minh"},
+  {sender:"Thành viên E", text:"Ui, căng rồi đấy.", type:"other"},
+  {sender:"Lan", text:"Em nói thẳng thôi, ai thấy bị động chạm thì… tùy. Anh cũng đang hạ thấp em đấy thôi!", type:"Lan"},
+  {sender:"Thành viên L", text:"Online ngon hơn chứ, vừa học vừa ăn xoài cũng được.", type:"other"},
+  {sender:"Thành viên Q", text:"😂 Offline thì được ăn ké xoài thiệt nha.", type:"other"},
+  {sender:"Admin Huy", text:"Mọi người dừng một chút nhé.\n* Mục tiêu diễn đàn là trao đổi để học hỏi, không phải tranh thắng–thua.\n* Đề nghị tất cả tập trung vào lập luận, tránh quy chụp cá nhân.\n* Ai cũng có quyền chia sẻ trải nghiệm, nhưng cách nói cần giữ sự tôn trọng.", type:"admin"},
+  {sender:"Admin Huy", text:"Giờ mình mời Lan và Minh chia sẻ lại ý kiến theo hướng trung lập hơn, kèm dẫn chứng rõ ràng.", type:"admin"},
+  {sender:"Lan", text:"Ừm, em nghĩ nãy giờ em cũng nói hơi quá, vì em muốn bảo vệ quan điểm của mình mà quên đi việc công nhận người khác.", type:"Lan"},
+  {sender:"Minh", text:"Anh cũng vậy, có lẽ anh đã để cảm xúc chi phối quá nhiều. Anh chỉ muốn chứng minh quan điểm của mình đúng mà buông ra những lời không hay.", type:"Minh"},
+  {sender:"Lan", text:"Ok, để rõ hơn: Nhóm em học online tiết kiệm được 4 giờ di chuyển/tuần, dùng bảng trắng online để ghi chú, và có video lưu lại. Điều này giúp thành viên xem lại khi vắng mặt.", type:"Lan"},
+  {sender:"Thành viên M", text:"Cái vụ lưu video hay ghê, offline khó làm được.", type:"other"},
+  {sender:"Minh", text:"Anh hiểu rồi. Nhóm anh thì gặp trực tiếp để luyện thuyết trình và phản biện, vì online khó bắt được cảm xúc người nghe. Nhưng anh công nhận online rất tiện trong khâu chia sẻ tài liệu.", type:"Minh"},
+  {sender:"Lan", text:"Vậy có lẽ tùy mục tiêu và hoàn cảnh mà chọn cách phù hợp.", type:"Lan"},
+  {sender:"Thành viên B", text:"Hay mình kết hợp cả hai: phần ôn bài, chia sẻ tài liệu làm online, phần thảo luận nhóm và luyện kĩ năng khó thì gặp trực tiếp.", type:"other"},
+  {sender:"Minh", text:"Ý này hợp lý ghê á. Vậy mà trước đây anh không nghĩ ra.", type:"Minh"},
+  {sender:"Lan", text:"Em cũng thấy vậy.", type:"Lan"},
+  {sender:"Admin Huy", text:"Cảm ơn mọi người đã cùng điều chỉnh cách đưa ra quan điểm. Đây là ví dụ rõ nhất cho thấy khác biệt ý kiến không phải vấn đề, cách chúng ta xử lý mới là điều quan trọng, ứng xử với nhau phải văn minh lịch sự.\nHy vọng sau này khi tranh luận, mọi người nhớ: Lắng nghe – đưa dẫn chứng – Tìm điểm chung.", type:"admin"},
+  {sender:"Thành viên S", text:"Hôm nay đúng là một bài học thực tế. Lúc đầu tưởng cãi nhau to, may có admin làm 'cầu nối'.", type:"other"},
+  {sender:"Thành viên T", text:"Ừ, cũng nhờ vậy mới rút ra được nhiều kinh nghiệm có ích.", type:"other"}
+];
+
+const chatContainer = document.getElementById('chat-container');
+
+let i = 0;
+
+function showMessage() {
+    if(i >= messages.length) return;
+    const msg = messages[i];
+    const div = document.createElement('div');
+    div.classList.add('message');
+    if(msg.type === "admin") div.classList.add('admin');
+    else if(msg.type === "Lan") div.classList.add('Lan');
+    else if(msg.type === "Minh") div.classList.add('Minh');
+    else div.classList.add('other');
+    div.innerHTML = `<span class="sender">${msg.sender}</span>${msg.text.replace(/\n/g,'<br>')}`;
+    chatContainer.appendChild(div);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    i++;
+    setTimeout(showMessage, 1000); // 1 giây một tin nhắn
+}
+
+showMessage();
+</script>
+</body>
+</html>
